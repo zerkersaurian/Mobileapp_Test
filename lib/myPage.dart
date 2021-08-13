@@ -89,21 +89,14 @@ class MylistState extends State<Mylist> {
     });
   }
 
-  addDate(indexs) {
-    /*
-    setState(() {
-      mybox.getAt(index)!.date.add(DateTime.now());
-    });
-    */
-  }
   Widget setupAlertDialogContainer(context, myboxIndex) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           color: Colors.grey,
-          height: 300.0, // Change as per your requirement
-          width: 300.0, // Change as per your requirement
+          height: 300.0,
+          width: 300.0,
           child: ListView.builder(
             itemCount: mybox.getAt(myboxIndex)!.date.length,
             itemBuilder: (BuildContext context, int index) {
@@ -193,16 +186,28 @@ class MylistState extends State<Mylist> {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: Text(mybox.getAt(index)!.title),
-                                    content: setupAlertDialogContainer(
-                                        context, index),
+                                    content: ValueListenableBuilder(
+                                        valueListenable: mybox.listenable(),
+                                        builder:
+                                            (context, Box<LastTime> mybox, _) {
+                                          return setupAlertDialogContainer(
+                                              context, index);
+                                        }),
                                     actions: <Widget>[
                                       TextButton(
                                           onPressed: () =>
                                               Navigator.of(context).pop(),
                                           child: Text('OK')),
                                       TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
+                                          onPressed: () {
+                                            setState(() {
+                                              mybox
+                                                  .getAt(index)!
+                                                  .date
+                                                  .add(DateTime.now());
+                                              Navigator.pop(context);
+                                            });
+                                          },
                                           child: Text('Add')),
                                     ],
                                   );
