@@ -38,11 +38,40 @@ class MylistState extends State<Mylist> {
     super.dispose();
   }
 
+  isHasTitle(title) {
+    for (int i = 0; i < mybox.length; i++) {
+      if (mybox.getAt(i)!.title == title) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  findTitle(title) {
+    for (int i = 0; i < mybox.length; i++) {
+      if (mybox.getAt(i)!.title == title) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
   submitText() {
     setState(() {
-      LastTime tmp = new LastTime(
-          titleController.text, categoriesController.text, DateTime.now());
-      mybox.add(tmp);
+      List<DateTime> newlist = [];
+      newlist.add(DateTime.now());
+      LastTime newLasttime;
+      String newTitle = titleController.text;
+      if (isHasTitle(titleController.text)) {
+        int index = findTitle(newTitle);
+        newLasttime = mybox.getAt(index)!;
+        newLasttime.date.add(DateTime.now());
+        mybox.put(index, newLasttime);
+      } else {
+        newLasttime =
+            new LastTime(newTitle, categoriesController.text, newlist);
+        mybox.add(newLasttime);
+      }
       _currentindex = 0;
     });
   }
@@ -60,6 +89,12 @@ class MylistState extends State<Mylist> {
     });
   }
 
+  addDate(index) {
+    setState(() {
+      mybox.getAt(index)!.date.add(DateTime.now());
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +105,61 @@ class MylistState extends State<Mylist> {
         index: _currentindex,
         children: [
           Center(
+              // Show all data page
+              child: Column(
+            children: [
+              Expanded(
+                  child: ValueListenableBuilder(
+                valueListenable: mybox.listenable(),
+                builder: (context, Box<LastTime> mybox, _) {
+                  return ListView.separated(
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(),
+                      padding: const EdgeInsets.all(8),
+                      itemCount: mybox.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: Text(mybox.getAt(index)!.title +
+                              " at " +
+                              mybox
+                                  .getAt(index)!
+                                  .date[mybox.getAt(index)!.date.length - 1]
+                                  .day
+                                  .toString() +
+                              "/" +
+                              mybox
+                                  .getAt(index)!
+                                  .date[mybox.getAt(index)!.date.length - 1]
+                                  .month
+                                  .toString() +
+                              "/" +
+                              mybox
+                                  .getAt(index)!
+                                  .date[mybox.getAt(index)!.date.length - 1]
+                                  .year
+                                  .toString() +
+                              " " +
+                              mybox
+                                  .getAt(index)!
+                                  .date[mybox.getAt(index)!.date.length - 1]
+                                  .hour
+                                  .toString() +
+                              " : " +
+                              mybox
+                                  .getAt(index)!
+                                  .date[mybox.getAt(index)!.date.length - 1]
+                                  .minute
+                                  .toString()),
+                          subtitle: Text(mybox.getAt(index)!.categories),
+                          onTap: addDate(index),
+                        );
+                      });
+                },
+              )),
+            ],
+          )),
+          Center(
+              // Search Page
               child: Column(
             children: <Widget>[
               SizedBox(
@@ -97,9 +187,6 @@ class MylistState extends State<Mylist> {
                 valueListenable: mybox.listenable(),
                 builder: (context, Box<LastTime> mybox, _) {
                   return ListView.builder(
-                      /*
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(),*/
                       padding: const EdgeInsets.all(8),
                       itemCount: mybox.length,
                       itemBuilder: (BuildContext context, int index) {
@@ -107,15 +194,35 @@ class MylistState extends State<Mylist> {
                           return ListTile(
                             title: Text(mybox.getAt(index)!.title +
                                 " at " +
-                                mybox.getAt(index)!.date.day.toString() +
+                                mybox
+                                    .getAt(index)!
+                                    .date[mybox.getAt(index)!.date.length - 1]
+                                    .day
+                                    .toString() +
                                 "/" +
-                                mybox.getAt(index)!.date.month.toString() +
+                                mybox
+                                    .getAt(index)!
+                                    .date[mybox.getAt(index)!.date.length - 1]
+                                    .month
+                                    .toString() +
                                 "/" +
-                                mybox.getAt(index)!.date.year.toString() +
+                                mybox
+                                    .getAt(index)!
+                                    .date[mybox.getAt(index)!.date.length - 1]
+                                    .year
+                                    .toString() +
                                 " " +
-                                mybox.getAt(index)!.date.hour.toString() +
+                                mybox
+                                    .getAt(index)!
+                                    .date[mybox.getAt(index)!.date.length - 1]
+                                    .hour
+                                    .toString() +
                                 " : " +
-                                mybox.getAt(index)!.date.minute.toString()),
+                                mybox
+                                    .getAt(index)!
+                                    .date[mybox.getAt(index)!.date.length - 1]
+                                    .minute
+                                    .toString()),
                             subtitle: Text(mybox.getAt(index)!.categories),
                           );
                         else
@@ -126,6 +233,7 @@ class MylistState extends State<Mylist> {
             ],
           )),
           Center(
+            // Add Page
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -161,6 +269,7 @@ class MylistState extends State<Mylist> {
             ),
           ),
           Center(
+            // Delete
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,9 +289,13 @@ class MylistState extends State<Mylist> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentindex,
+        type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.data_usage), label: "Show Data"),
+              icon: Icon(Icons.data_usage),
+              label: "Show All Data",
+              backgroundColor: Colors.blue),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
           BottomNavigationBarItem(icon: Icon(Icons.delete), label: "Delete")
         ],

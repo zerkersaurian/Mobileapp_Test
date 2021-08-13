@@ -8,9 +8,10 @@ class LastTime {
 
   @HiveField(1)
   final String categories;
+  // ทำความสะอาด | งาน | อื่นๆ
 
   @HiveField(2)
-  final DateTime date;
+  List<DateTime> date;
 
   LastTime(this.title, this.categories, this.date);
 }
