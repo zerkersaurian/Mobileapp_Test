@@ -1,4 +1,5 @@
 Flutter LastTime Tracker
+
 ** เซ็ต category ไว้แบบตกลงกันเองว่า category นั้น จะใช้กันแค่ 'ทำความสะอาด' / 'งาน' / 'อื่นๆ' ซึ่งสามารถใส่นอกจากนี้ได้ แค่ตกลงปากเปล่ากันเอาไว้ **
 
 Main page : show all Lasttime ![image](https://user-images.githubusercontent.com/60808968/129381301-1dcbd883-98b8-42b2-9b41-6db684cf6c98.png) 
