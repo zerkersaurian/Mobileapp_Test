@@ -91,6 +91,7 @@ class MylistState extends State<Mylist> {
   }
 
   Widget setupAlertDialogContainer(context, myboxIndex) {
+    // for aleartdialog after tapping one of the LastTime list
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -145,8 +146,8 @@ class MylistState extends State<Mylist> {
       body: IndexedStack(
         index: _currentindex,
         children: [
+          // --------------------------------------------------------------------- Show All Data Page ------------------------------------------------------------------
           Center(
-              // Show all data page
               child: Column(
             children: [
               Expanded(
@@ -236,42 +237,52 @@ class MylistState extends State<Mylist> {
                                               context, index);
                                         }),
                                     actions: <Widget>[
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                          child: Text('OK')),
-                                      TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              List<DateTime> date =
-                                                  mybox.getAt(index)!.date;
-                                              date.add(DateTime.now());
-                                              LastTime newLasttime = LastTime(
-                                                  mybox.getAt(index)!.title,
-                                                  mybox
-                                                      .getAt(index)!
-                                                      .categories,
-                                                  date);
-                                              mybox.put(index, newLasttime);
-                                              Navigator.pop(context);
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(
-                                                          "Successfully Added"),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context),
-                                                            child: Text("OK"))
-                                                      ],
-                                                    );
-                                                  });
-                                            });
-                                          },
-                                          child: Text('Add')),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  List<DateTime> date =
+                                                      mybox.getAt(index)!.date;
+                                                  date.add(DateTime.now());
+                                                  LastTime newLasttime =
+                                                      LastTime(
+                                                          mybox
+                                                              .getAt(index)!
+                                                              .title,
+                                                          mybox
+                                                              .getAt(index)!
+                                                              .categories,
+                                                          date);
+                                                  mybox.put(index, newLasttime);
+                                                  Navigator.pop(context);
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              "Successfully Added"),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context),
+                                                                child:
+                                                                    Text("OK"))
+                                                          ],
+                                                        );
+                                                      });
+                                                });
+                                              },
+                                              child: Text('Add')),
+                                          TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              child: Text('OK')),
+                                        ],
+                                      )
                                     ],
                                   );
                                 });
@@ -282,8 +293,8 @@ class MylistState extends State<Mylist> {
               )),
             ],
           )),
+          // --------------------------------------------------------------------- Search Page ------------------------------------------------------------------
           Center(
-              // Search Page
               child: Column(
             children: <Widget>[
               SizedBox(
@@ -404,42 +415,54 @@ class MylistState extends State<Mylist> {
                                                 context, index);
                                           }),
                                       actions: <Widget>[
-                                        TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
-                                            child: Text('OK')),
-                                        TextButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                List<DateTime> date =
-                                                    mybox.getAt(index)!.date;
-                                                date.add(DateTime.now());
-                                                LastTime newLasttime = LastTime(
-                                                    mybox.getAt(index)!.title,
-                                                    mybox
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    List<DateTime> date = mybox
                                                         .getAt(index)!
-                                                        .categories,
-                                                    date);
-                                                mybox.put(index, newLasttime);
-                                                Navigator.pop(context);
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return AlertDialog(
-                                                        title: Text(
-                                                            "Successfully Added"),
-                                                        actions: <Widget>[
-                                                          TextButton(
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      context),
-                                                              child: Text("OK"))
-                                                        ],
-                                                      );
-                                                    });
-                                              });
-                                            },
-                                            child: Text('Add')),
+                                                        .date;
+                                                    date.add(DateTime.now());
+                                                    LastTime newLasttime =
+                                                        LastTime(
+                                                            mybox
+                                                                .getAt(index)!
+                                                                .title,
+                                                            mybox
+                                                                .getAt(index)!
+                                                                .categories,
+                                                            date);
+                                                    mybox.put(
+                                                        index, newLasttime);
+                                                    Navigator.pop(context);
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AlertDialog(
+                                                            title: Text(
+                                                                "Successfully Added"),
+                                                            actions: <Widget>[
+                                                              TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.pop(
+                                                                          context),
+                                                                  child: Text(
+                                                                      "OK"))
+                                                            ],
+                                                          );
+                                                        });
+                                                  });
+                                                },
+                                                child: Text('Add')),
+                                            TextButton(
+                                                onPressed: () =>
+                                                    Navigator.of(context).pop(),
+                                                child: Text('OK')),
+                                          ],
+                                        )
                                       ],
                                     );
                                   });
@@ -452,8 +475,8 @@ class MylistState extends State<Mylist> {
               )),
             ],
           )),
+          // --------------------------------------------------------------------- Adding Page ------------------------------------------------------------------
           Center(
-            // Add Page
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -500,8 +523,8 @@ class MylistState extends State<Mylist> {
               ],
             ),
           ),
+          // --------------------------------------------------------------------- Delete All Page ------------------------------------------------------------------
           Center(
-            // Delete
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -559,7 +582,7 @@ class MylistState extends State<Mylist> {
               backgroundColor: Colors.blue),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
-          BottomNavigationBarItem(icon: Icon(Icons.delete), label: "Delete")
+          BottomNavigationBarItem(icon: Icon(Icons.delete), label: "Delete"),
         ],
         onTap: (index) {
           setState(() {
