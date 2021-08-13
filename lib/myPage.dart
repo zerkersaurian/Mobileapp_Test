@@ -89,17 +89,53 @@ class MylistState extends State<Mylist> {
     });
   }
 
-  addDate(index) {
+  addDate(indexs) {
+    /*
     setState(() {
       mybox.getAt(index)!.date.add(DateTime.now());
     });
+    */
+  }
+  Widget setupAlertDialogContainer(context, myboxIndex) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          color: Colors.grey,
+          height: 300.0, // Change as per your requirement
+          width: 300.0, // Change as per your requirement
+          child: ListView.builder(
+            itemCount: mybox.getAt(myboxIndex)!.date.length,
+            itemBuilder: (BuildContext context, int index) {
+              dynamic date = mybox.getAt(myboxIndex)!.date.reversed.toList();
+              return ListTile(
+                title: Card(
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: Text(date[index].day.toString() +
+                              "/" +
+                              date[index].month.toString() +
+                              "/" +
+                              date[index].year.toString() +
+                              " at " +
+                              date[index].hour.toString() +
+                              ":" +
+                              date[index].minute.toString()),
+                        ))),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hive & Navigation bar"),
+        title: Text("LastTime List"),
       ),
       body: IndexedStack(
         index: _currentindex,
@@ -144,14 +180,34 @@ class MylistState extends State<Mylist> {
                                   .date[mybox.getAt(index)!.date.length - 1]
                                   .hour
                                   .toString() +
-                              " : " +
+                              ":" +
                               mybox
                                   .getAt(index)!
                                   .date[mybox.getAt(index)!.date.length - 1]
                                   .minute
                                   .toString()),
                           subtitle: Text(mybox.getAt(index)!.categories),
-                          onTap: addDate(index),
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text(mybox.getAt(index)!.title),
+                                    content: setupAlertDialogContainer(
+                                        context, index),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('OK')),
+                                      TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('Add')),
+                                    ],
+                                  );
+                                });
+                          },
                         );
                       });
                 },
