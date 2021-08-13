@@ -12,11 +12,11 @@ class Mylist extends StatefulWidget {
 class MylistState extends State<Mylist> {
   int _currentindex = 0;
   String searchCategories = '';
+  String categoriesListString = '';
 
   final mybox = Hive.box<LastTime>('data');
   late TextEditingController titleController;
   late TextEditingController categoriesController;
-  late TextEditingController dateController;
   late TextEditingController searchController;
 
   @override
@@ -24,7 +24,6 @@ class MylistState extends State<Mylist> {
     super.initState();
     titleController = TextEditingController();
     categoriesController = TextEditingController();
-    dateController = TextEditingController();
     searchController = TextEditingController();
     searchCategories = '';
   }
@@ -33,7 +32,6 @@ class MylistState extends State<Mylist> {
   void dispose() {
     titleController.dispose();
     categoriesController.dispose();
-    dateController.dispose();
     searchController.dispose();
     super.dispose();
   }
@@ -73,20 +71,23 @@ class MylistState extends State<Mylist> {
         mybox.add(newLasttime);
       }
       _currentindex = 0;
+      titleController.text = '';
+      categoriesController.text = '';
     });
   }
 
   setSearch() {
     setState(() {
       searchCategories = searchController.text;
+      searchController.text = '';
     });
   }
 
-  deleteData() {
-    setState(() {
-      mybox.clear();
-      _currentindex = 0;
-    });
+  minuteTwoDigit(minute) {
+    if (minute < 10)
+      return "0$minute";
+    else
+      return minute.toString();
   }
 
   Widget setupAlertDialogContainer(context, myboxIndex) {
@@ -118,7 +119,7 @@ class MylistState extends State<Mylist> {
                                     " at " +
                                     date[index].hour.toString() +
                                     ":" +
-                                    date[index].minute.toString(),
+                                    minuteTwoDigit(date[index].minute),
                                 style: TextStyle(
                                     color: index == 0
                                         ? Colors.white
@@ -159,38 +160,68 @@ class MylistState extends State<Mylist> {
                       itemCount: mybox.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ListTile(
-                          title: Text(mybox.getAt(index)!.title +
-                              " at " +
-                              mybox
-                                  .getAt(index)!
-                                  .date[mybox.getAt(index)!.date.length - 1]
-                                  .day
-                                  .toString() +
-                              "/" +
-                              mybox
-                                  .getAt(index)!
-                                  .date[mybox.getAt(index)!.date.length - 1]
-                                  .month
-                                  .toString() +
-                              "/" +
-                              mybox
-                                  .getAt(index)!
-                                  .date[mybox.getAt(index)!.date.length - 1]
-                                  .year
-                                  .toString() +
-                              " " +
-                              mybox
-                                  .getAt(index)!
-                                  .date[mybox.getAt(index)!.date.length - 1]
-                                  .hour
-                                  .toString() +
-                              ":" +
-                              mybox
-                                  .getAt(index)!
-                                  .date[mybox.getAt(index)!.date.length - 1]
-                                  .minute
-                                  .toString()),
-                          subtitle: Text(mybox.getAt(index)!.categories),
+                          title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  mybox.getAt(index)!.title,
+                                  style: TextStyle(fontSize: 21),
+                                ),
+                                Text(
+                                    mybox
+                                            .getAt(index)!
+                                            .date[mybox
+                                                    .getAt(index)!
+                                                    .date
+                                                    .length -
+                                                1]
+                                            .day
+                                            .toString() +
+                                        "/" +
+                                        mybox
+                                            .getAt(index)!
+                                            .date[mybox
+                                                    .getAt(index)!
+                                                    .date
+                                                    .length -
+                                                1]
+                                            .month
+                                            .toString() +
+                                        "/" +
+                                        mybox
+                                            .getAt(index)!
+                                            .date[mybox
+                                                    .getAt(index)!
+                                                    .date
+                                                    .length -
+                                                1]
+                                            .year
+                                            .toString(),
+                                    style: TextStyle(fontSize: 21))
+                              ]),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(mybox.getAt(index)!.categories,
+                                  style: TextStyle(fontSize: 17)),
+                              Text(
+                                  mybox
+                                          .getAt(index)!
+                                          .date[
+                                              mybox.getAt(index)!.date.length -
+                                                  1]
+                                          .hour
+                                          .toString() +
+                                      ":" +
+                                      minuteTwoDigit(mybox
+                                          .getAt(index)!
+                                          .date[
+                                              mybox.getAt(index)!.date.length -
+                                                  1]
+                                          .minute),
+                                  style: TextStyle(fontSize: 17))
+                            ],
+                          ),
                           onTap: () {
                             showDialog(
                                 context: context,
@@ -223,22 +254,21 @@ class MylistState extends State<Mylist> {
                                                   date);
                                               mybox.put(index, newLasttime);
                                               Navigator.pop(context);
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AlertDialog(
-                                                            title: Text(
-                                                                "Successfully Added"),
-                                                            actions: <Widget>[
-                                                              TextButton(
-                                                                  onPressed: () =>
-                                                                      Navigator.pop(
-                                                                          context),
-                                                                  child: Text(
-                                                                      'OK')),
-                                                            ],
-                                                          )));
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                          "Successfully Added"),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context),
+                                                            child: Text("OK"))
+                                                      ],
+                                                    );
+                                                  });
                                             });
                                           },
                                           child: Text('Add')),
@@ -259,19 +289,28 @@ class MylistState extends State<Mylist> {
               SizedBox(
                 height: 30,
               ),
-              TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText:
-                        'Search Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
-              ),
+              Container(
+                  width: 500,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText:
+                            'Search Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
+                  )),
               SizedBox(
                 height: 30,
               ),
-              ElevatedButton(
-                onPressed: setSearch,
-                child: Text('Search'),
+              Container(
+                width: 120,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: setSearch,
+                  child: Text(
+                    'Search',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -286,38 +325,125 @@ class MylistState extends State<Mylist> {
                       itemBuilder: (BuildContext context, int index) {
                         if (mybox.getAt(index)!.categories == searchCategories)
                           return ListTile(
-                            title: Text(mybox.getAt(index)!.title +
-                                " at " +
-                                mybox
-                                    .getAt(index)!
-                                    .date[mybox.getAt(index)!.date.length - 1]
-                                    .day
-                                    .toString() +
-                                "/" +
-                                mybox
-                                    .getAt(index)!
-                                    .date[mybox.getAt(index)!.date.length - 1]
-                                    .month
-                                    .toString() +
-                                "/" +
-                                mybox
-                                    .getAt(index)!
-                                    .date[mybox.getAt(index)!.date.length - 1]
-                                    .year
-                                    .toString() +
-                                " " +
-                                mybox
-                                    .getAt(index)!
-                                    .date[mybox.getAt(index)!.date.length - 1]
-                                    .hour
-                                    .toString() +
-                                " : " +
-                                mybox
-                                    .getAt(index)!
-                                    .date[mybox.getAt(index)!.date.length - 1]
-                                    .minute
-                                    .toString()),
-                            subtitle: Text(mybox.getAt(index)!.categories),
+                            title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(mybox.getAt(index)!.title,
+                                      style: TextStyle(fontSize: 21)),
+                                  Text(
+                                      mybox
+                                              .getAt(index)!
+                                              .date[mybox
+                                                      .getAt(index)!
+                                                      .date
+                                                      .length -
+                                                  1]
+                                              .day
+                                              .toString() +
+                                          "/" +
+                                          mybox
+                                              .getAt(index)!
+                                              .date[mybox
+                                                      .getAt(index)!
+                                                      .date
+                                                      .length -
+                                                  1]
+                                              .month
+                                              .toString() +
+                                          "/" +
+                                          mybox
+                                              .getAt(index)!
+                                              .date[mybox
+                                                      .getAt(index)!
+                                                      .date
+                                                      .length -
+                                                  1]
+                                              .year
+                                              .toString(),
+                                      style: TextStyle(fontSize: 21))
+                                ]),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(mybox.getAt(index)!.categories,
+                                    style: TextStyle(fontSize: 17)),
+                                Text(
+                                    mybox
+                                            .getAt(index)!
+                                            .date[mybox
+                                                    .getAt(index)!
+                                                    .date
+                                                    .length -
+                                                1]
+                                            .hour
+                                            .toString() +
+                                        ":" +
+                                        minuteTwoDigit(mybox
+                                            .getAt(index)!
+                                            .date[mybox
+                                                    .getAt(index)!
+                                                    .date
+                                                    .length -
+                                                1]
+                                            .minute),
+                                    style: TextStyle(fontSize: 17))
+                              ],
+                            ),
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(mybox.getAt(index)!.title),
+                                      content: ValueListenableBuilder(
+                                          valueListenable: mybox.listenable(),
+                                          builder: (context,
+                                              Box<LastTime> mybox, _) {
+                                            return setupAlertDialogContainer(
+                                                context, index);
+                                          }),
+                                      actions: <Widget>[
+                                        TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(),
+                                            child: Text('OK')),
+                                        TextButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                List<DateTime> date =
+                                                    mybox.getAt(index)!.date;
+                                                date.add(DateTime.now());
+                                                LastTime newLasttime = LastTime(
+                                                    mybox.getAt(index)!.title,
+                                                    mybox
+                                                        .getAt(index)!
+                                                        .categories,
+                                                    date);
+                                                mybox.put(index, newLasttime);
+                                                Navigator.pop(context);
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        title: Text(
+                                                            "Successfully Added"),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      context),
+                                                              child: Text("OK"))
+                                                        ],
+                                                      );
+                                                    });
+                                              });
+                                            },
+                                            child: Text('Add')),
+                                      ],
+                                    );
+                                  });
+                            },
                           );
                         else
                           return SizedBox();
@@ -334,27 +460,39 @@ class MylistState extends State<Mylist> {
                 SizedBox(
                   height: 50,
                 ),
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Enter Title'),
-                ),
+                Container(
+                    width: 500,
+                    child: TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Enter Title'),
+                    )),
                 SizedBox(
                   height: 30,
                 ),
-                TextField(
-                  controller: categoriesController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText:
-                          'Enter Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
-                ),
+                Container(
+                    width: 500,
+                    child: TextField(
+                      controller: categoriesController,
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText:
+                              'Enter Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
+                    )),
                 SizedBox(
                   height: 30,
                 ),
-                ElevatedButton(
-                  onPressed: submitText,
-                  child: Text('submit'),
+                Container(
+                  width: 120,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: submitText,
+                    child: Text(
+                      'Add',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: 20,
@@ -368,14 +506,44 @@ class MylistState extends State<Mylist> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Delete All Data"),
+                Text(
+                  "Delete All Data",
+                  style: TextStyle(fontSize: 40, color: Colors.blue),
+                ),
                 SizedBox(
                   height: 20,
                 ),
-                ElevatedButton(
-                  onPressed: deleteData,
-                  child: Text('Delete'),
-                ),
+                Container(
+                    height: 50,
+                    width: 120,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Are you sure?"),
+                                actions: <Widget>[
+                                  TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          mybox.clear();
+                                          _currentindex = 0;
+                                          Navigator.pop(context);
+                                        });
+                                      },
+                                      child: Text("Delete")),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Cancel")),
+                                ],
+                              );
+                            });
+                      },
+                      child: Text('Delete'),
+                    )),
               ],
             ),
           ),
