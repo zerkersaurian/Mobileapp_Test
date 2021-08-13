@@ -1,35 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'Data.dart';
+part of 'LastTime.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DataAdapter extends TypeAdapter<Data> {
+class LastTimeAdapter extends TypeAdapter<LastTime> {
   @override
   final int typeId = 0;
 
   @override
-  Data read(BinaryReader reader) {
+  LastTime read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Data(
+    return LastTime(
       fields[0] as String,
-      fields[1] as int,
+      fields[1] as String,
+      fields[2] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Data obj) {
+  void write(BinaryWriter writer, LastTime obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.title)
       ..writeByte(1)
-      ..write(obj.number);
+      ..write(obj.categories)
+      ..writeByte(2)
+      ..write(obj.date);
   }
 
   @override
@@ -38,7 +41,7 @@ class DataAdapter extends TypeAdapter<Data> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DataAdapter &&
+      other is LastTimeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

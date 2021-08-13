@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:preparation/class/Data.dart';
+import 'package:preparation/class/LastTime.dart';
 
 class Mylist extends StatefulWidget {
   @override
@@ -11,31 +11,45 @@ class Mylist extends StatefulWidget {
 
 class MylistState extends State<Mylist> {
   int _currentindex = 0;
+  String searchCategories = '';
 
-  final mybox = Hive.box<Data>('data');
-  late TextEditingController string_controller;
-  late TextEditingController int_controller;
+  final mybox = Hive.box<LastTime>('data');
+  late TextEditingController titleController;
+  late TextEditingController categoriesController;
+  late TextEditingController dateController;
+  late TextEditingController searchController;
 
   @override
   void initState() {
     super.initState();
-    string_controller = TextEditingController();
-    int_controller = TextEditingController();
+    titleController = TextEditingController();
+    categoriesController = TextEditingController();
+    dateController = TextEditingController();
+    searchController = TextEditingController();
+    searchCategories = '';
   }
 
   @override
   void dispose() {
-    string_controller.dispose();
-    int_controller.dispose();
+    titleController.dispose();
+    categoriesController.dispose();
+    dateController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
   submitText() {
     setState(() {
-      Data tmp =
-          new Data(string_controller.text, int.parse(int_controller.text));
+      LastTime tmp = new LastTime(
+          titleController.text, categoriesController.text, DateTime.now());
       mybox.add(tmp);
       _currentindex = 0;
+    });
+  }
+
+  setSearch() {
+    setState(() {
+      searchCategories = searchController.text;
     });
   }
 
@@ -58,19 +72,57 @@ class MylistState extends State<Mylist> {
           Center(
               child: Column(
             children: <Widget>[
-              Expanded(
-                child: ListView.separated(
-                    separatorBuilder: (BuildContext context, int index) =>
-                        const Divider(),
-                    padding: const EdgeInsets.all(8),
-                    itemCount: mybox.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: Text(mybox.getAt(index)!.name),
-                        subtitle: Text(mybox.getAt(index)!.number.toString()),
-                      );
-                    }),
+              SizedBox(
+                height: 30,
               ),
+              TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText:
+                        'Search Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                onPressed: setSearch,
+                child: Text('Search'),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Expanded(
+                  child: ValueListenableBuilder(
+                valueListenable: mybox.listenable(),
+                builder: (context, Box<LastTime> mybox, _) {
+                  return ListView.builder(
+                      /*
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(),*/
+                      padding: const EdgeInsets.all(8),
+                      itemCount: mybox.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (mybox.getAt(index)!.categories == searchCategories)
+                          return ListTile(
+                            title: Text(mybox.getAt(index)!.title +
+                                " at " +
+                                mybox.getAt(index)!.date.day.toString() +
+                                "/" +
+                                mybox.getAt(index)!.date.month.toString() +
+                                "/" +
+                                mybox.getAt(index)!.date.year.toString() +
+                                " " +
+                                mybox.getAt(index)!.date.hour.toString() +
+                                " : " +
+                                mybox.getAt(index)!.date.minute.toString()),
+                            subtitle: Text(mybox.getAt(index)!.categories),
+                          );
+                        else
+                          return SizedBox();
+                      });
+                },
+              )),
             ],
           )),
           Center(
@@ -81,20 +133,22 @@ class MylistState extends State<Mylist> {
                   height: 50,
                 ),
                 TextField(
-                  controller: string_controller,
+                  controller: titleController,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Enter String'),
+                      border: OutlineInputBorder(), labelText: 'Enter Title'),
                 ),
                 SizedBox(
                   height: 30,
                 ),
                 TextField(
-                  controller: int_controller,
+                  controller: categoriesController,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Enter int'),
+                      border: OutlineInputBorder(),
+                      labelText:
+                          'Enter Categories ( ทำความสะอาด / งาน / อื่นๆ )'),
                 ),
                 SizedBox(
-                  height: 20,
+                  height: 30,
                 ),
                 ElevatedButton(
                   onPressed: submitText,
