@@ -11,7 +11,7 @@ class LastTime {
   // ทำความสะอาด | งาน | อื่นๆ
 
   @HiveField(2)
-  List<DateTime> date;
+  final List<DateTime> date;
 
   LastTime(this.title, this.categories, this.date);
 }

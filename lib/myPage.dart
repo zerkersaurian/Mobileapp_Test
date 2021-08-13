@@ -103,19 +103,30 @@ class MylistState extends State<Mylist> {
               dynamic date = mybox.getAt(myboxIndex)!.date.reversed.toList();
               return ListTile(
                 title: Card(
-                    child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: Text(date[index].day.toString() +
-                              "/" +
-                              date[index].month.toString() +
-                              "/" +
-                              date[index].year.toString() +
-                              " at " +
-                              date[index].hour.toString() +
-                              ":" +
-                              date[index].minute.toString()),
-                        ))),
+                    color: index == 0 ? Colors.blue[800] : Colors.white,
+                    child: Column(
+                      children: [
+                        Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(
+                                date[index].day.toString() +
+                                    "/" +
+                                    date[index].month.toString() +
+                                    "/" +
+                                    date[index].year.toString() +
+                                    " at " +
+                                    date[index].hour.toString() +
+                                    ":" +
+                                    date[index].minute.toString(),
+                                style: TextStyle(
+                                    color: index == 0
+                                        ? Colors.white
+                                        : Colors.black),
+                              ),
+                            )),
+                      ],
+                    )),
               );
             },
           ),
@@ -201,11 +212,33 @@ class MylistState extends State<Mylist> {
                                       TextButton(
                                           onPressed: () {
                                             setState(() {
-                                              mybox
-                                                  .getAt(index)!
-                                                  .date
-                                                  .add(DateTime.now());
+                                              List<DateTime> date =
+                                                  mybox.getAt(index)!.date;
+                                              date.add(DateTime.now());
+                                              LastTime newLasttime = LastTime(
+                                                  mybox.getAt(index)!.title,
+                                                  mybox
+                                                      .getAt(index)!
+                                                      .categories,
+                                                  date);
+                                              mybox.put(index, newLasttime);
                                               Navigator.pop(context);
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AlertDialog(
+                                                            title: Text(
+                                                                "Successfully Added"),
+                                                            actions: <Widget>[
+                                                              TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.pop(
+                                                                          context),
+                                                                  child: Text(
+                                                                      'OK')),
+                                                            ],
+                                                          )));
                                             });
                                           },
                                           child: Text('Add')),
